@@ -1,22 +1,31 @@
 from django.shortcuts import render, get_object_or_404
 
-from blog.forms import CommentForm
-from blog.models import Post
+from .forms import CommentForm
+from .models import Post
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from taggit.models import Tag
 
 
-def post_list(request):
+def post_list(request, tag_slug=None):
     posts = Post.objects.all()
-    paginator = Paginator(posts, 4)
-    page = request.GET.get('page', 1)
+    tag = None
 
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        posts = posts.filter(tags__in=[tag])
+
+    paginator = Paginator(posts, 4)
+
+    page = request.GET.get('page', 1)
     try:
         posts = paginator.page(page)
     except PageNotAnInteger:
         posts.paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/post_list.html', {'posts': posts, 'page': page})
+    return render(request, 'blog/post_list.html', {'posts': posts,
+                                                   'page': page,
+                                                   'tag': tag})
 
 
 def post_detail(request, pk):
@@ -35,5 +44,7 @@ def post_detail(request, pk):
     else:
         # в любом случае верни форму комментария
         comment_form = CommentForm()
-    return render(request, 'blog/post_detail.html', {'post': post, 'comments': comments, 'comment_form': comment_form})
+    return render(request, 'blog/post_detail.html', {'post': post,
+                                                     'comments': comments,
+                                                     'comment_form': comment_form})
 

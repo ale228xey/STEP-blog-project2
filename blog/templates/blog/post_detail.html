@@ -18,7 +18,7 @@
         </div>
         <a class="btn btn-primary" href="{% url 'post_list' %}" role="button">На главную</a>
         {% for comment in comments %}
-        <h2>Комментарии:</h2>
+        <h2><i class="far fa-comments"></i>Комментарии:</h2>
         <div class="card-body">
         <h2>{{comment.name}}    </h2>
         </div>
@@ -33,7 +33,7 @@
 <div class="container">
 <form action="" method="post"> {% csrf_token %}
     {{comment_form.as_p}}
-    <input type="submit">
+    <input type="submit" class="btn btn-primary">
 </form>
 </div>
 
